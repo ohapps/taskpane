@@ -11,6 +11,10 @@ namespace Application;
 
 use Zend\Mvc\ModuleRouteListener;
 use Zend\Mvc\MvcEvent;
+use Application\Model\Task;
+use Application\Model\TaskTable;
+use Zend\Db\ResultSet\ResultSet;
+use Zend\Db\TableGateway\TableGateway;
 
 class Module
 {
@@ -36,4 +40,24 @@ class Module
             ),
         );
     }
+
+    public function getServiceConfig()
+    {
+	return array(
+		'factories' => array(
+			'Application\Model\TaskTable' => function($sm){
+				$tableGateway = $sm->get('ApplicationTableGateway');
+				$table = new TaskTable($tableGateway);
+				return $table;
+			},
+			'ApplicationTableGateway' => function($sm){
+				$dbAdapter = $sm->get('Zend\Db\Adapter\Adapter');
+				$resultSetPrototype = new ResultSet();
+				$resultSetPrototype->setArrayObjectPrototype(new Task());
+				return new TableGateway('tasks', $dbAdapter, null, $resultSetPrototype);
+			},
+		),
+	);
+    }
+
 }

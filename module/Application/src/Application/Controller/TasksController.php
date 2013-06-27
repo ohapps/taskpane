@@ -12,10 +12,14 @@ namespace Application\Controller;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\ViewModel;
 
-class IndexController extends AbstractActionController{
+class TasksController extends AbstractActionController{
     
     public function indexAction(){
-        return new ViewModel();
+	$sm = $this->getServiceLocator();
+	$taskTable = $sm->get('Application\Model\TaskTable');
+        return new ViewModel(array(
+		'tasks' => $taskTable->fetchAll()
+	));
     }
 
 }
